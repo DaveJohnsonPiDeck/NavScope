@@ -1,0 +1,413 @@
+<!doctype html>
+<!--
+  NavScope Web UI shell.
+  Provides windowed layout containers; data is populated by app.js.
+-->
+<html lang="en" data-theme="night">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NavScope</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-left">
+          <div class="brand">
+            <span class="logo-dot"></span>
+            <div>
+              <div class="title">NavScope</div>
+            </div>
+          </div>
+        <div class="gnss-label">GNSS Data</div>
+        <div class="badge" id="health-badge">LIVE</div>
+        <div class="badge" id="fix-badge">3D Fix</div>
+      </div>
+      <div class="topbar-right">
+        <div class="views-menu">
+          <button class="chip ghost" type="button" id="views-menu-toggle">Views</button>
+          <div class="views-dropdown" id="views-menu">
+            <div class="menu-section">
+              <div class="menu-title">Style</div>
+              <button class="menu-item" id="theme-toggle" type="button">Night</button>
+            </div>
+            <div class="menu-section">
+              <div class="menu-title">Load layout</div>
+              <button class="menu-item" type="button" data-action="load-layout" data-slot="custom1">Custom 1</button>
+              <button class="menu-item" type="button" data-action="load-layout" data-slot="custom2">Custom 2</button>
+              <button class="menu-item" type="button" data-action="load-layout" data-slot="custom3">Custom 3</button>
+              <button class="menu-item" type="button" data-action="force-tile">Scale</button>
+              <button class="menu-item" type="button" data-action="cascade-layout">Cascade</button>
+            </div>
+            <div class="menu-section">
+              <div class="menu-title">Save layout</div>
+              <label class="menu-item save-default">
+                <input type="checkbox" data-startup-slot="custom1" />
+                <span>Custom 1</span>
+                <button class="menu-item-button" type="button" data-action="save-layout" data-slot="custom1">Save</button>
+              </label>
+              <label class="menu-item save-default">
+                <input type="checkbox" data-startup-slot="custom2" />
+                <span>Custom 2</span>
+                <button class="menu-item-button" type="button" data-action="save-layout" data-slot="custom2">Save</button>
+              </label>
+              <label class="menu-item save-default">
+                <input type="checkbox" data-startup-slot="custom3" />
+                <span>Custom 3</span>
+                <button class="menu-item-button" type="button" data-action="save-layout" data-slot="custom3">Save</button>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="cards-menu">
+          <button class="chip" type="button" id="cards-menu-toggle">Cards</button>
+          <div class="cards-dropdown" id="cards-menu">
+            <label><input type="checkbox" data-panel="position-panel" checked /> Position</label>
+            <label><input type="checkbox" data-panel="sky-panel" checked /> Sky Plot</label>
+            <label><input type="checkbox" data-panel="snr-panel" checked /> Signal to Noise Ratio</label>
+            <label><input type="checkbox" data-panel="map-panel" checked /> Map</label>
+            <label><input type="checkbox" data-panel="alt-panel" checked /> Altimeter</label>
+            <label><input type="checkbox" data-panel="time-panel" checked /> Clock</label>
+            <label><input type="checkbox" data-panel="speed-panel" checked /> Speed</label>
+            <label><input type="checkbox" data-panel="cog-panel" checked /> Course Over Ground</label>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="workspace" id="workspace">
+      <div class="panel" id="position-panel" data-title="Position + Quality">
+        <div class="panel-header">
+          <span>Position + Quality</span>
+          <div class="panel-actions">
+            <button class="panel-btn" data-action="maximize" title="Maximize">&#9633;</button>
+            <button class="panel-btn" data-action="close" title="Close">X</button>
+          </div>
+        </div>
+          <div class="panel-body">
+            <div class="card position-card">
+              <div class="rows">
+                <div class="row">
+                  <div class="label">Fix</div>
+                  <div class="value" id="fix-summary">--</div>
+                </div>
+                <div class="row">
+                  <div class="label">Quality</div>
+                  <div class="value" id="fix-quality">--</div>
+                </div>
+                <div class="row">
+                  <div class="label">Lat / Lon</div>
+                  <div class="value" id="latlon">--</div>
+                </div>
+                <div class="row">
+                  <div class="label">UTC Time</div>
+                  <div class="value" id="utc-time">UTC --</div>
+                </div>
+                <div class="row">
+                  <div class="label">Altitude</div>
+                  <div class="value" id="altitude">--</div>
+                </div>
+                <div class="row dop-row">
+                  <div class="label">PDOP</div>
+                  <div class="value">
+                    <div class="dop-bar">
+                      <div class="dop-fill" id="dop-pdop-fill"></div>
+                    </div>
+                    <span class="dop-value" id="dop-pdop-value">--</span>
+                  </div>
+                </div>
+                <div class="row dop-row">
+                  <div class="label">HDOP</div>
+                  <div class="value">
+                    <div class="dop-bar">
+                      <div class="dop-fill" id="dop-hdop-fill"></div>
+                    </div>
+                    <span class="dop-value" id="dop-hdop-value">--</span>
+                  </div>
+                </div>
+                <div class="row dop-row">
+                  <div class="label">VDOP</div>
+                  <div class="value">
+                    <div class="dop-bar">
+                      <div class="dop-fill" id="dop-vdop-fill"></div>
+                    </div>
+                    <span class="dop-value" id="dop-vdop-value">--</span>
+                  </div>
+                </div>
+              <div class="row">
+                <div class="label">Satellites</div>
+                <div class="value" id="counts">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-resize" aria-hidden="true"></div>
+      </div>
+
+      <div class="panel" id="sky-panel" data-title="Sky Plot">
+        <div class="panel-header">
+          <span>Sky Plot</span>
+          <div class="panel-actions">
+            <button class="panel-btn" data-action="maximize" title="Maximize">&#9633;</button>
+            <button class="panel-btn" data-action="close" title="Close">X</button>
+          </div>
+        </div>
+        <div class="panel-body">
+            <div class="card sky-card">
+              <div class="sky-layout">
+                <div class="sky-main">
+                  <div class="sky-wrap">
+                    <canvas id="sky-canvas"></canvas>
+                    <div id="sky-tooltip" class="sky-tooltip" hidden></div>
+                  </div>
+                </div>
+              <div class="sky-side">
+                <div class="sky-section">
+                  <div class="section-title">GNSS constellation</div>
+                  <label class="const-row">
+                    <input type="checkbox" id="filter-gps" checked />
+                    <span class="flag gps">US</span>
+                    <span>GPS (G)</span>
+                    <span class="count" id="count-gps">0/0</span>
+                  </label>
+                  <label class="const-row">
+                    <input type="checkbox" id="filter-sbas" checked />
+                    <span class="flag sbas">SB</span>
+                    <span>SBAS (S)</span>
+                    <span class="count" id="count-sbas">0/0</span>
+                  </label>
+                  <label class="const-row">
+                    <input type="checkbox" id="filter-galileo" checked />
+                    <span class="flag galileo">EU</span>
+                    <span>Galileo (E)</span>
+                    <span class="count" id="count-galileo">0/0</span>
+                  </label>
+                  <label class="const-row">
+                    <input type="checkbox" id="filter-beidou" checked />
+                    <span class="flag beidou">CN</span>
+                    <span>BeiDou (B)</span>
+                    <span class="count" id="count-beidou">0/0</span>
+                  </label>
+                  <label class="const-row">
+                    <input type="checkbox" id="filter-glonass" checked />
+                    <span class="flag glonass">RU</span>
+                    <span>GLONASS (R)</span>
+                    <span class="count" id="count-glonass">0/0</span>
+                  </label>
+                </div>
+                <div class="sky-section">
+                  <div class="section-title">Filter satellites</div>
+                  <label class="const-row simple">
+                    <input type="checkbox" id="filter-tracked" checked />
+                    <span>Show not tracked</span>
+                  </label>
+                </div>
+                <div class="sky-section">
+                  <div class="section-title">Legend</div>
+                  <div class="legend-row">
+                    <span class="legend-dot used"></span>
+                    <span>Used</span>
+                  </div>
+                  <div class="legend-row">
+                    <span class="legend-x"></span>
+                    <span>Tracked (not used)</span>
+                  </div>
+                  <div class="legend-row">
+                    <span class="legend-dot dim"></span>
+                    <span>Not tracked</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-resize" aria-hidden="true"></div>
+      </div>
+
+      <div class="panel" id="snr-panel" data-title="Signal to Noise Ratio">
+        <div class="panel-header">
+          <span>Signal to Noise Ratio</span>
+          <div class="panel-actions">
+            <button class="panel-btn" data-action="maximize" title="Maximize">&#9633;</button>
+            <button class="panel-btn" data-action="close" title="Close">X</button>
+          </div>
+        </div>
+          <div class="panel-body">
+            <div class="card snr-card">
+              <div class="card-header">
+                <div class="card-meta">
+                  <button class="chip ghost snr-mode-toggle" id="snr-mode-toggle" type="button">Bars</button>
+                </div>
+              </div>
+              <div class="snr-chart">
+                <canvas class="snr-axis" id="snr-axis"></canvas>
+                <div class="snr-plot">
+                  <canvas id="snr-canvas"></canvas>
+                  <div id="snr-tooltip" class="snr-tooltip" hidden></div>
+                </div>
+                <div class="snr-key" id="snr-key"></div>
+                <div class="snr-rows">
+                </div>
+              </div>
+            </div>
+          </div>
+        <div class="panel-resize" aria-hidden="true"></div>
+      </div>
+
+      <div class="panel" id="map-panel" data-title="Map">
+        <div class="panel-header">
+          <span>Map</span>
+          <div class="panel-actions">
+            <button class="panel-btn" data-action="maximize" title="Maximize">&#9633;</button>
+            <button class="panel-btn" data-action="close" title="Close">X</button>
+          </div>
+        </div>
+        <div class="panel-body">
+            <div class="card map-card">
+              <div class="card-header">
+                <div class="card-meta">
+                  <button class="chip ghost" id="map-mode-toggle" type="button">Centered</button>
+                  <button class="chip ghost" id="map-rotate-toggle" type="button">North Up</button>
+                  <button class="chip ghost" id="map-vector-toggle" type="button">Vector On</button>
+                </div>
+              </div>
+              <div class="map-wrap">
+                <div id="map-canvas"></div>
+              </div>
+          </div>
+        </div>
+        <div class="panel-resize" aria-hidden="true"></div>
+      </div>
+
+      <div class="panel" id="alt-panel" data-title="Altimeter">
+        <div class="panel-header">
+          <span>Altimeter</span>
+          <div class="panel-actions">
+            <button class="panel-btn" data-action="maximize" title="Maximize">&#9633;</button>
+            <button class="panel-btn" data-action="close" title="Close">X</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="card alt-card">
+            <div class="card-header">
+              <div class="card-meta">
+                <button class="chip ghost" id="alt-mode-toggle" type="button">Dial</button>
+                <select id="alt-units">
+                  <option value="m">m</option>
+                  <option value="ft">ft</option>
+                </select>
+              </div>
+            </div>
+            <div class="alt-wrap">
+              <div class="alt-scale-floating">
+                <span class="alt-scale-units" id="alt-scale-units">m</span>
+                <select id="alt-scale">
+                  <option value="1">x1</option>
+                  <option value="10">x10</option>
+                  <option value="100" selected>x100</option>
+                  <option value="1000">x1000</option>
+                </select>
+              </div>
+              <canvas id="alt-canvas"></canvas>
+              <div class="alt-digital" id="alt-digital">--</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-resize" aria-hidden="true"></div>
+      </div>
+
+      <div class="panel" id="time-panel" data-title="Clock">
+        <div class="panel-header">
+          <span>Clock</span>
+          <div class="panel-actions">
+            <button class="panel-btn" data-action="maximize" title="Maximize">&#9633;</button>
+            <button class="panel-btn" data-action="close" title="Close">X</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="card time-card">
+            <div class="card-header">
+              <div class="card-meta">
+                <button class="chip ghost" id="time-mode-toggle" type="button">Dial</button>
+                <select id="time-zone">
+                    <option value="utc">UTC</option>
+                    <option value="local">Local</option>
+                    <option value="local+1">Local +1</option>
+                  </select>
+                </div>
+              </div>
+              <div class="time-wrap">
+                <canvas id="time-canvas"></canvas>
+              <div class="time-digital" id="time-digital">--:--:--</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-resize" aria-hidden="true"></div>
+      </div>
+
+      <div class="panel" id="speed-panel" data-title="Speed">
+        <div class="panel-header">
+          <span>Speed</span>
+          <div class="panel-actions">
+            <button class="panel-btn" data-action="maximize" title="Maximize">&#9633;</button>
+            <button class="panel-btn" data-action="close" title="Close">X</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="card speed-card">
+            <div class="card-header">
+              <div class="card-meta">
+                <button class="chip ghost" id="speed-mode-toggle" type="button">Dial</button>
+                <select id="speed-units">
+                    <option value="kn">kn</option>
+                    <option value="mps">m/s</option>
+                    <option value="kmh">km/h</option>
+                    <option value="mph">mph</option>
+                  </select>
+                </div>
+            </div>
+            <div class="speed-wrap">
+              <canvas id="speed-canvas"></canvas>
+              <input class="speed-max-floating" id="speed-max" type="number" min="10" max="400" step="5" value="120" inputmode="numeric" />
+              <div class="speed-footer">
+                <div class="speed-digital" id="speed-digital">--</div>
+              </div>
+            </div>
+            </div>
+        </div>
+        <div class="panel-resize" aria-hidden="true"></div>
+      </div>
+
+      <div class="panel" id="cog-panel" data-title="Course Over Ground">
+        <div class="panel-header">
+          <span>Course Over Ground</span>
+          <div class="panel-actions">
+            <button class="panel-btn" data-action="maximize" title="Maximize">&#9633;</button>
+            <button class="panel-btn" data-action="close" title="Close">X</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="card cog-card">
+            <div class="card-header">
+              <div class="card-meta">
+                <button class="chip ghost" id="cog-mode-toggle" type="button">Dial</button>
+              </div>
+            </div>
+            <div class="cog-wrap">
+              <canvas id="cog-canvas"></canvas>
+              <div class="cog-digital" id="cog-digital">--</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-resize" aria-hidden="true"></div>
+      </div>
+    </section>
+  </div>
+
+    <script src="/static/vendor/leaflet/leaflet.js"></script>
+    <script src="/static/vendor/leaflet-rotate/leaflet-rotate-src.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
