@@ -31,28 +31,38 @@ Notes:
 
 ## Stage 1/2: Web UI
 
-Run the web server:
+### PC Quick Start (Windows)
 
-```bash
-python -m GNSserver.web_main --port COM3 --baud 9600
-```
-
-Windows quick start:
+Windows / PC quick start (recommended):
 
 ```bat
 start_navscope.bat --port COM3 --baud 9600
 ```
 
-Note: NavScope is primarily targeted at Raspberry Pi; Windows support is
-mainly for convenience and testing.
+This starts the tile server on port 5000 (if needed), the GNSS web server on
+port 8000, and opens your browser to the UI.
 
-Launch both servers and open the UI (Windows). This starts the tile server
-on port 5000 if needed, starts the web server on port 8000 if needed, and
-opens the browser:
+Windows setup (one-time):
+
+1) Install Python 3.10+ from python.org (check "Add python.exe to PATH").
+2) Install dependencies:
 
 ```bat
-start_navscope.bat
+python -m pip install aiohttp flask flask-cors requests tqdm pyserial
 ```
+
+3) Plug in the GPS and find the COM port in Device Manager
+   (Ports (COM & LPT) → USB Serial/ACM device).
+4) Run the quick start command above with that COM port.
+
+Run the web server directly (advanced):
+
+```bash
+python -m GNSserver.web_main --port COM3 --baud 9600
+```
+
+Note: NavScope is primarily targeted at Raspberry Pi; Windows support is
+mainly for convenience and testing.
 
 Pass args to the GNSS web server (examples). Args are forwarded to
 `python -m GNSserver.web_main`:
@@ -75,6 +85,8 @@ TILE_FOLDER = "C:/path/to/tiles"
 If the folder is empty, the tile server will begin building the offline cache as you pan/zoom.
 
 ## Raspberry Pi / Linux setup
+
+### Pi Quick Start
 
 Install system packages:
 
