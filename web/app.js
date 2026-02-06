@@ -168,7 +168,7 @@ setTheme(localStorage.getItem("navscope-theme") || "night");
 
 function fmtCoord(value) {
   if (value === null || value === undefined) return "--";
-  return value.toFixed(6);
+  return value.toFixed(3);
 }
 
 function fmtAlt(value) {
@@ -1911,7 +1911,7 @@ function drawAltimeter(altMeters) {
 
   if (altDigital) {
     const unitLabel = units === "ft" ? "ft" : "m";
-    altDigital.textContent = `${displayAlt.toFixed(0)}`;
+    altDigital.innerHTML = `<span class="alt-value">${displayAlt.toFixed(0)}</span><span class="alt-unit">${unitLabel}</span>`;
     altDigital.style.color = Number.isFinite(displayAlt) ? "var(--value-bright)" : "var(--value-dim)";
   }
   if (isDigital) return;
@@ -2249,7 +2249,7 @@ function drawSpeedometer(speedKnots) {
   const step = getSpeedStep(max);
 
   if (speedDigital) {
-    speedDigital.textContent = `${speed.toFixed(1)}`;
+    speedDigital.innerHTML = `<span class="speed-value">${speed.toFixed(1)}</span><span class="speed-unit">${units}</span>`;
     speedDigital.style.color = speedKnots !== null && speedKnots !== undefined ? "var(--value-bright)" : "var(--value-dim)";
   }
   if (isDigital) return;
@@ -2380,7 +2380,7 @@ function setCogMode(mode) {
 
 function formatCog(cogDeg, valid) {
   if (!valid || cogDeg === null || cogDeg === undefined) return "--";
-  return `${Math.round(cogDeg)} deg`;
+  return `${Math.round(cogDeg)}\u00B0`;
 }
 
 function cogCardinal(cogDeg, valid) {
@@ -2397,10 +2397,10 @@ function drawCog(cogDeg, speedKnots) {
   if (cogDigital) {
     if (valid) {
       const cardinal = cogCardinal(cogDeg, valid);
-      cogDigital.innerHTML = `<span class="cog-value">${formatCog(cogDeg, valid)} ${cardinal}</span>`;
+      cogDigital.innerHTML = `<span class="cog-value"><span class="cog-deg">${formatCog(cogDeg, valid)}</span><span class="cog-cardinal">${cardinal}</span></span>`;
       cogDigital.style.color = "var(--value-bright)";
     } else {
-      cogDigital.innerHTML = `<span class="cog-value">--</span>`;
+      cogDigital.innerHTML = `<span class="cog-value"><span class="cog-deg">--</span><span class="cog-cardinal">--</span></span>`;
       cogDigital.style.color = "var(--value-dim)";
     }
   }
@@ -2491,7 +2491,7 @@ function drawCog(cogDeg, speedKnots) {
   ctx.font = `${Math.round(22 * scale)}px Bahnschrift`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText("deg", cx, cy + ring * 0.225);
+  ctx.fillText("\u00B0", cx, cy + ring * 0.225);
 }
 
 const snrPatternCache = new Map();

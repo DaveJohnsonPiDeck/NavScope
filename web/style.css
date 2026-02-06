@@ -944,13 +944,21 @@ html[data-theme="night"] #snr-axis {
 
 .alt-wrap.digital {
   justify-content: center;
+  --dial-digital-size: clamp(3rem, 15cqw, 18rem);
+}
+
+.alt-wrap.digital .alt-scale-floating {
+  display: none;
 }
 
 .alt-wrap.digital .alt-digital {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(4rem, 20cqw, 27rem);
+  flex-direction: column;
+  gap: 6px;
+  line-height: 1;
+  font-size: var(--dial-digital-size);
   font-weight: 600;
   color: var(--text);
   min-height: 0;
@@ -1005,13 +1013,14 @@ html[data-theme="night"] #snr-axis {
 
 .time-wrap.digital {
   justify-content: center;
+  --dial-digital-size: clamp(3rem, 15cqw, 18rem);
 }
 
 .time-wrap.digital .time-digital {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(4rem, 20cqw, 27rem);
+  font-size: var(--dial-digital-size);
   font-weight: 600;
   color: var(--text);
   min-height: 0;
@@ -1112,16 +1121,27 @@ html[data-theme="night"] #snr-axis {
 
 .speed-wrap.digital {
   justify-content: center;
+  --dial-digital-size: clamp(3rem, 15cqw, 18rem);
 }
 
 .speed-wrap.digital .speed-digital {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(4rem, 20cqw, 27rem);
+  flex-direction: column;
+  gap: 6px;
+  line-height: 1;
+  font-size: var(--dial-digital-size);
   font-weight: 600;
   color: var(--text);
   min-height: 0;
+}
+
+.alt-unit,
+.speed-unit {
+  font-size: var(--dial-digital-size);
+  letter-spacing: 0.04em;
+  color: inherit;
 }
 
 .speed-wrap.digital .speed-footer {
@@ -1181,8 +1201,19 @@ html[data-theme="night"] #snr-axis {
 }
 
 .cog-value {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  gap: 6px;
+  width: 100%;
   font-size: var(--dial-label-size);
   color: inherit;
+}
+
+.cog-deg,
+.cog-cardinal {
+  display: block;
 }
 
 .cog-status {
@@ -1199,6 +1230,7 @@ html[data-theme="night"] #snr-axis {
 
 .cog-wrap.digital {
   justify-content: center;
+  --dial-digital-size: clamp(3rem, 15cqw, 18rem);
 }
 
 .cog-wrap.digital .cog-digital {
@@ -1209,8 +1241,26 @@ html[data-theme="night"] #snr-axis {
 }
 
 .cog-wrap.digital .cog-value {
-  font-size: clamp(4rem, 20cqw, 27rem);
+  font-size: var(--dial-digital-size);
   font-weight: 600;
+}
+
+@media (max-width: 1400px) {
+  .alt-wrap.digital,
+  .time-wrap.digital,
+  .speed-wrap.digital,
+  .cog-wrap.digital {
+    --dial-digital-size: clamp(2.2rem, 11cqw, 7rem);
+  }
+}
+
+@media (max-width: 1100px) {
+  .alt-wrap.digital,
+  .time-wrap.digital,
+  .speed-wrap.digital,
+  .cog-wrap.digital {
+    --dial-digital-size: clamp(1.8rem, 9cqw, 6rem);
+  }
 }
 
 .snr-chart {
